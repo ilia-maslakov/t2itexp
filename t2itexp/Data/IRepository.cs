@@ -3,15 +3,17 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using t2itexp.Models;
 
 namespace t2itexp.Data
 {
     public interface IRepository<T> where T : class
     {
+        int Count();
         T? Get(int id);
-        IEnumerable<T>? Get();
-        IEnumerable<T>? Get(Func<T, Boolean> predicate);
-        IEnumerable<T>? Get(int page = 1, int pageSize = 20);
+        IEnumerable<T> Get();
+        IEnumerable<T> Get(Func<T, Boolean> predicate);
+        IEnumerable<T> Get(int page = 1, int pageSize = 20);
         ValueTask<T?> GetAsync(int id);
         Task<List<T>> GetAsync();
         T Add(T item);
@@ -20,5 +22,6 @@ namespace t2itexp.Data
         void Remove(T item);
         void Remove(Func<T, Boolean> predicate);
         void Update(T item);
+        Task<int> AddRange(IEnumerable<Phone> items);
     }
 }

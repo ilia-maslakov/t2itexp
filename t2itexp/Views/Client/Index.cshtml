@@ -1,0 +1,106 @@
+@model PhoneList
+@{
+    string nextDisabled = "";
+    string prevDisabled = "";
+    ViewData["Title"] = "Index";
+}
+
+<div class="row mb-3">
+    <div class="col">
+        <label for="jsonPre" class="form-label">JSON struct example</label>
+    <pre id="jsonPre">
+        [
+            {
+                "Code": 123,
+                "Value": "This is value"
+            },
+            {
+                "Code": 321,
+                "Value": "This is another value"
+            }
+        ]</pre>
+    <form asp-action="Create">
+        <div class="row">
+            <div class="col">
+                <label for="jsonTextarea" class="form-label">JSON to parse</label>
+                <textarea class="form-control" name="jsonTextarea" id="jsonTextarea" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <input class="form-check-input" type="checkbox" value="" id="delCheck" name="delCheck" checked>
+                <label class="form-check-label" for="delCheck">Clear Table before insert</label>
+            </div>
+            <div class="col">
+                <button id="success" type="submit" class="btn btn-primary btn-sm" style="float: right; margin:4px">Сохранить</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                     <th>
+                        id
+                    </th>
+                    <th>
+                        code
+                    </th>
+                    <th>
+                        value
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (Model.Phones != null)
+            {
+                @foreach (var item in Model.Phones)
+                {
+                    <tr>
+                        <td>
+                            @item.Id
+                        </td>
+                        <td>
+                            @item.Code
+                        </td>
+                        <td>
+                            @item.Value
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <div class="col">
+        @{
+            int fromPage = 0;
+            int toPage = Model.PagesOnScreen;
+            if (Model.CurrentPage > Model.PagesOnScreen / 2)
+            {
+                fromPage = Model.CurrentPage - (Model.PagesOnScreen / 2);
+                toPage = Math.Min(fromPage + Model.PagesOnScreen, Model.LastPage);
+            }
+
+            nextDisabled = Model.CurrentPage < Model.LastPage ? "" : "disabled";
+            prevDisabled = Model.CurrentPage > 0 ? "" : "disabled";
+        }
+
+        <a asp-action="Page" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn-outline-primary @prevDisabled">Предыдущая</a>
+        @for (var i = fromPage; i <= toPage; i++)
+        {
+            if (i == Model.CurrentPage) {
+                <a asp-action="Page" asp-route-page="@i" class="btn btn-primary">@i</a>
+            } else {
+                <a asp-action="Page" asp-route-page="@i" class="btn btn-outline-primary">@i</a>
+            }
+        }
+        <a asp-action="Page" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn-outline-primary @nextDisabled">Следующая</a>
+        </div>
+    </div>
+</div>

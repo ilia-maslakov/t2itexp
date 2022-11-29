@@ -1,0 +1,54 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 0px;
+}
+
+.left-nav {
+    background-color: #f8f9fa;
+    height: 85vh;
+    padding: 7px;
+}
+
+.search-content {
+    background-image: url("../images/map.jpg");
+    background-repeat: no-repeat, no-repeat;
+    background-size: 100% 100%;
+    background-color: #f8f9fa;
+    height: 85vh;
+    padding: 5px;
+}
+
+.card-search {
+    width: 23rem;
+    background-color: #f9fafbcc !important;
+}
+
+.nav-pills {
+    width: 100%;
+}
+
+.nav-pills .nav-link {
+    background: 0 0;
+    border: solid 1px;
+    border-radius: .25rem;
+    border-color: #0d6efd;
+    margin-bottom: 7px;
+}
+
+.row-np {
+    padding-right: 0 !important;
+}

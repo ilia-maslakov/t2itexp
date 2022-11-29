@@ -17,7 +17,7 @@ namespace t2itexp.Configure
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app)
         {
             app.UseDefaultFiles();
             app.UseStaticFiles(new StaticFileOptions

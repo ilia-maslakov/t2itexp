@@ -13,7 +13,8 @@ namespace t2itexp.Configure
         /// <param name="services"></param>
         public static void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+//            services.AddControllers();
+            services.AddControllersWithViews();
         }
     }
 }

@@ -1,12 +1,7 @@
 ﻿using t2itexp.Data.EF;
-using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using t2itexp.Models;
 
 namespace t2itexp.Data
 {
@@ -21,6 +16,11 @@ namespace t2itexp.Data
             _logger = LoggerFactory.Create(options => { }).CreateLogger<UnitOfWork>();
         }
 
+        public int Count()
+        {
+            return _context.Phone.Count();
+        }
+
         Phone? IRepository<Phone>.Get(int id)
         {
             try
@@ -28,8 +28,8 @@ namespace t2itexp.Data
                 return _context.Phone.Find(id);
             } catch (Exception e)
             {
-                _logger.LogInformation($"{DateTime.UtcNow.ToLongTimeString()} Error: {e.Message}");
-                return null;
+                _logger.LogInformation("{Time} Error: {Message}", DateTime.UtcNow.ToLongTimeString(), e.Message);
+                return new Phone();
             }
         }
 
@@ -38,23 +38,30 @@ namespace t2itexp.Data
             return _context.Phone.ToList();
         }
 
-        public IEnumerable<Phone>? Get(int page = 1, int pageSize = 20)
+        public IEnumerable<Phone> Get(int page = 1, int pageSize = 20)
         {
             try
             {
-                var res = _context.Phone.OrderBy(i => i.Code).Skip(pageSize * page).Take(pageSize).ToList();
-                return res;
+                return _context.Phone.OrderBy(i => i.Code).Skip(pageSize * page).Take(pageSize).ToList();
             }
             catch (Exception e)
             {
-                _logger.LogInformation($"{DateTime.UtcNow.ToLongTimeString()} Error: {e.Message}");
-                return null;
+                _logger.LogInformation("{Time} Error: {Message}", DateTime.UtcNow.ToLongTimeString(), e.Message);
+                return new List<Phone>() { };
             }
         }
 
         IEnumerable<Phone> IRepository<Phone>.Get(Func<Phone, bool> predicate)
         {
-            return _context.Phone.Where(predicate).ToList();
+            try
+            {
+                return _context.Phone.Where(predicate).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation("{Time} Error: {Message}", DateTime.UtcNow.ToLongTimeString(), e.Message);
+                return new List<Phone>() { };
+            }
         }
 
         public ValueTask<Phone?> GetAsync(int id)
@@ -81,8 +88,7 @@ namespace t2itexp.Data
             }
             catch (Exception e)
             {
-                _logger.LogInformation($"{DateTime.UtcNow.ToLongTimeString()} Error: {e.Message}");
-
+                _logger.LogInformation("{Time} Error: {Message}", DateTime.UtcNow.ToLongTimeString(), e.Message);
                 return Task.Run(() => new List<Phone>());
             }
         }
@@ -90,7 +96,7 @@ namespace t2itexp.Data
 
         Phone IRepository<Phone>.Add(Phone item)
         {
-            _logger.LogInformation($"{DateTime.UtcNow.ToLongTimeString()} Try Add phone ({item})");
+            _logger.LogInformation("{Time} Try Add item ({Item})", DateTime.UtcNow.ToLongTimeString(), item);
             _context.Add(item);
             return item;
         }
@@ -124,6 +130,27 @@ namespace t2itexp.Data
             foreach (Phone o in _context.Phone.Where(predicate).ToList())
             {
                 _context.Phone.Remove(o);
+            }
+            _context.SaveChanges();
+        }
+
+        public async Task<int> AddRange(IEnumerable<Phone> items)
+        {
+            foreach (var p in items)
+            {
+                // clear Id then it is filled
+                p.Id = 0;
+                _context.Phone.Add(p);
+            }
+            try
+            {
+                int count = await _context.SaveChangesAsync();
+                return count;
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation("{Time} Error: {Message}", DateTime.UtcNow.ToLongTimeString(), e.Message);
+                return 0;
             }
         }
     }

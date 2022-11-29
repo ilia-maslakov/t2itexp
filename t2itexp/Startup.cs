@@ -45,7 +45,8 @@ namespace t2itexp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Client}/{action=Index}/{id?}"
+                );
             });
         }
     }

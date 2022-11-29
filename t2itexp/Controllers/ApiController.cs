@@ -10,14 +10,14 @@ using t2itexp.Validators;
 namespace t2itexp.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class PhoneController : ControllerBase
+    [Route("Api")]
+    public class ApiController : ControllerBase
     {
-        private readonly ILogger<PhoneController> _logger;
+        private readonly ILogger<ApiController> _logger;
         private readonly PhoneValidator _validator;
         private readonly UnitOfWork _unitOfWork;
 
-        public PhoneController(ILogger<PhoneController> logger, UnitOfWork unitOfWork)
+        public ApiController(ILogger<ApiController> logger, UnitOfWork unitOfWork)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
@@ -75,7 +75,7 @@ namespace t2itexp.Controllers
             return p;
         }
 
-        [HttpPost("Delete/{id}")]
+        [HttpDelete("Delete/{id}")]
         public ContentResult Delete(int id)
         {
             _unitOfWork.Phone.Remove(id);
@@ -99,8 +99,8 @@ namespace t2itexp.Controllers
         ///             "id": 0,
         ///             "Code": "321",
         ///             "Value": "Ths is onother value"
-        ///         },
-        ///
+        ///         }
+        ///     ]
         /// </remarks>
         /// <param name="array of objects"></param>
         /// <returns>A newly created TodoItem</returns>
@@ -109,23 +109,10 @@ namespace t2itexp.Controllers
         public async Task<ActionResult<int>> Add([FromBody] List<Phone> phones)
         {
             if (phones == null) {
-                return 0;
+                return BadRequest($"Error: List of Phones is empty");
             }
-            foreach (var p in phones)
-            {
-                p.Id = 0;
-                // clear Id then it is filled
-                _unitOfWork.Phone.Add(p);
-            }
-            try
-            {
-                int count = await _unitOfWork.SaveChangesAsync();
-                return Content($"Added {count} records");
-            }
-            catch (DbUpdateConcurrencyException e)
-            {
-                return BadRequest($"Error: {e.Message}");
-            }
+            var count = await _unitOfWork.Phone.AddRange(phones);
+            return Content($"Added {count} records");
         }
 
 
@@ -152,7 +139,7 @@ namespace t2itexp.Controllers
             {
                 foreach (var error in result.Errors)
                 {
-                    _logger.LogInformation($"{DateTime.UtcNow.ToLongTimeString()} User validation errors: {error.ErrorMessage}");
+                    _logger.LogInformation("{Time} User validation errors: {Message}", DateTime.UtcNow.ToLongTimeString(), error.ErrorMessage);
                 }
 
                 return false;
